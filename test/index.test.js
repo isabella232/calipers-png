@@ -8,6 +8,7 @@ var png    = require('../lib/index');
 describe('png', function () {
 
   describe('detect', function () {
+
     it('should return true for a PNG', function () {
       var pngPath = path.resolve(__dirname, 'fixtures/png/123x456.png');
       var result = png.detect(fs.readFileSync(pngPath));
@@ -19,6 +20,7 @@ describe('png', function () {
       var result = png.detect(fs.readFileSync(jpegPath));
       expect(result).to.eql(false);
     });
+
   });
 
   describe('measure', function () {
@@ -36,16 +38,24 @@ describe('png', function () {
         pages: [{ width: width, height: height }]
       };
 
-      it('should return the correct dimensions for ' + file, function () {
+      it('should return the correct dimensions for a path to ' + file, function () {
         var pngPath = path.resolve(fixtures, file);
         var fd = fs.openSync(pngPath, 'r');
         return png.measure(pngPath, fd)
-        .bind({})
         .then(function (result) {
           expect(result).to.eql(expectedOutput);
         })
         .finally(function () {
           fs.closeSync(fd);
+        });
+      });
+
+      it('should return the correct dimensions for a buffer of ' + file, function () {
+        var pngPath = path.resolve(fixtures, file);
+        var buffer = fs.readFileSync(pngPath);
+        return png.measure(buffer)
+        .then(function (result) {
+          expect(result).to.eql(expectedOutput);
         });
       });
 
